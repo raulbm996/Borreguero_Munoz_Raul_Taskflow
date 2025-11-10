@@ -1,6 +1,3 @@
-<?php
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -194,12 +191,22 @@
 
 <body>
     <header>
-        <h1>Bienvenido a <?php echo $SITE_NAME; ?></h1>
+        <h1>Bienvenido a <?php echo "TaskFlow"; ?></h1>
     </header>
 
     <main>
-        <h2>Perfil del Usuario</h2>
-        <p><strong>Nombre:</strong><?php echo $userName; ?></p>
-        <p><strong>Edad:</strong><?php echo $userAge; ?>años</p>
-        <p><strong>Estado de la cuenta:</strong>Usuario<?php echo $isPremiumUser ? "Premium" : "Estandar"; ?></p>
+        <?php
+        $tasks = [
+            ['title' => 'Implementar Login', 'completed' => true, 'priority' => 'alta'],
+            ['title' => 'Añadir Pruebas Unitarias', 'completed' => false, 'priority' => 'media'],
+        ];
+        foreach ($tasks as $task) {
+            renderizarTarea($task);
+        }
+        ?>
     </main>
+
+
+</body>
+
+</html>
