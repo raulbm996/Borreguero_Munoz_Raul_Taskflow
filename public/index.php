@@ -1,58 +1,50 @@
 <?php
+//1. Cargar todas nuestras herramientas
 require_once '../app/functions.php';
-//Bloque de configuración principal
-define("SITE_NAME", "TaskFlow");
-$pageTitle = "Página de Inicio";
-$userName = "Raul"; //Tipo String
-$userAge = "20"; //Tipo Integer
-$isPremiumUser = true; //Tipo Boolean 
+require_once '../app/data.php';
+require_once '../app/controllers/AuthController.php';
 
-// Array principal de tareas
-$tasks = [
-    // Tarea 1
-    [
-        'title' => 'Implementar sistema de autenticación',
-        'completed' => false,
-        'priority' => 'alta'
-    ],
+//2. Lógica del Router
+$accion = $_GET['accion'] ?? 'login';
 
-    // Tarea 2
-    [
-        'title' => 'Revisar políticas de almacenamiento',
-        'completed' => true,
-        'priority' => 'alta'
-    ],
+switch ($accion) {
+    case 'login':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = $_POST['email'];
+            $password = $_POST['password'];
 
-    // Tarea 3
-    [
-        'title' => 'Configurar copias de seguridad del NAS',
-        'completed' => true,
-        'priority' => 'media'
-    ],
+            if (handleLogin($email, $password, $usuarios_bbdd)) {
+                header('Location: index.php?accion=dashboard');
+                exit;
+            } else {
+                $error = "Credenciales incorrectas.";
+            }
+        }
 
-    // Tarea 4
-    [
-        'title' => 'Actualizar documentación técnica',
-        'completed' => false,
-        'priority' => 'baja'
-    ],
+        include '../app/views/login.view.php';
+        break;
 
-    // Tarea 5
-    [
-        'title' => 'Realizar pruebas de restauración',
-        'completed' => false,
-        'priority' => 'media'
-    ]
-];
+    case 'dashboard':
+        if (!checkAuth()) {
+            header('Location: index.php?accion=login');
+            exit;
+        }
+
+        $tareas = [
+            ['titulo' => 'Implementar Login', 'completado' => true, 'prioridad' => 'alta'],
+            ['titulo' => 'Añadir Pruebas Unitarias', 'completado' => false, 'prioridad' => 'media'],
+        ];
+
+        include '../app/views/tareas.view.php';
+        break;
+
+    case 'logout':
+        handleLogout();
+        break;
+
+    default:
+        echo "Error 404: Página no encontrada.";
+        break;
+}
+
 ?>
-
-<?php include '../app/views/header.php' ?>
-<h2>Tareas Pendientes</h2>
-<ul>
-    <?php
-    foreach ($tasks as $task) {
-        renderizarTarea($task);
-    }
-    ?>
-</ul>
-<?php include '../app/views/footer.php'; ?>
